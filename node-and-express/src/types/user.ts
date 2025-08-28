@@ -1,11 +1,6 @@
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  age: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { User } from '../entities/User';
+
+export type { User };
 
 export interface CreateUserRequest {
   name: string;

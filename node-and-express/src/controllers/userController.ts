@@ -17,7 +17,7 @@ class UserController {
       }
 
       // Verificar se email já existe
-      const existingUser = userService.getUserByEmail(userData.email);
+      const existingUser = await userService.getUserByEmail(userData.email);
       if (existingUser) {
         return res.status(409).json({
           success: false,
@@ -25,7 +25,7 @@ class UserController {
         });
       }
 
-      const newUser = userService.createUser(userData);
+      const newUser = await userService.createUser(userData);
       
       res.status(201).json({
         success: true,
@@ -44,7 +44,7 @@ class UserController {
   // READ - GET /users
   async getAllUsers(req: Request, res: Response) {
     try {
-      const users = userService.getAllUsers();
+      const users = await userService.getAllUsers();
       
       res.status(200).json({
         success: true,
@@ -64,7 +64,7 @@ class UserController {
   async getUserById(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const user = userService.getUserById(id);
+      const user = await userService.getUserById(+id);
 
       if (!user) {
         return res.status(404).json({
@@ -93,7 +93,7 @@ class UserController {
       const userData: UpdateUserRequest = req.body;
 
       // Verificar se o usuário existe
-      const existingUser = userService.getUserById(id);
+      const existingUser = await userService.getUserById(+id);
       if (!existingUser) {
         return res.status(404).json({
           success: false,
@@ -103,7 +103,7 @@ class UserController {
 
       // Se estiver atualizando o email, verificar se já existe
       if (userData.email && userData.email !== existingUser.email) {
-        const userWithEmail = userService.getUserByEmail(userData.email);
+        const userWithEmail = await userService.getUserByEmail(userData.email);
         if (userWithEmail) {
           return res.status(409).json({
             success: false,
@@ -112,7 +112,7 @@ class UserController {
         }
       }
 
-      const updatedUser = userService.updateUser(id, userData);
+      const updatedUser = await userService.updateUser(+id, userData);
       
       res.status(200).json({
         success: true,
@@ -132,7 +132,7 @@ class UserController {
   async deleteUser(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const deleted = userService.deleteUser(id);
+      const deleted = await userService.deleteUser(+id);
 
       if (!deleted) {
         return res.status(404).json({

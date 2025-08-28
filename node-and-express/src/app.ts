@@ -1,10 +1,20 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import { AppDataSource } from './config/database';
 import userRoutes from './routes/userRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Inicializar TypeORM
+AppDataSource.initialize()
+  .then(() => {
+    console.log('✅ TypeORM inicializado com sucesso');
+  })
+  .catch((error: any) => {
+    console.error('❌ Erro ao inicializar TypeORM:', error);
+  });
 
 // Middleware
 app.use(cors());

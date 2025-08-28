@@ -68,13 +68,20 @@ npm start
 - **Node.js** - Runtime JavaScript
 - **Express** - Framework web
 - **TypeScript** - Linguagem tipada
+- **TypeORM** - ORM para TypeScript
+- **SQLite** - Banco de dados em memória (para desenvolvimento)
 - **CORS** - Cross-Origin Resource Sharing
 - **Body Parser** - Parsing de requisições
+- **Class Validator** - Validação de dados
 
 ## 📁 Estrutura do projeto
 
 ```
 src/
+├── entities/
+│   └── User.ts          # Entidade TypeORM
+├── config/
+│   └── database.ts      # Configuração TypeORM
 ├── types/
 │   └── user.ts          # Interfaces TypeScript
 ├── services/

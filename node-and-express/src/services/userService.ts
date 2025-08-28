@@ -1,69 +1,69 @@
-import { User, CreateUserRequest, UpdateUserRequest } from '../types/user';
+import { Repository } from 'typeorm';
+import { AppDataSource } from '../config/database';
+import { User } from '../entities/User';
+import { CreateUserRequest, UpdateUserRequest } from '../types/user';
 
 class UserService {
-  private users: User[] = [];
-  private nextId = 1;
+  private userRepository: Repository<User>;
+
+  constructor() {
+    this.userRepository = AppDataSource.getRepository(User);
+  }
 
   // CREATE - Criar um novo usuário
-  createUser(userData: CreateUserRequest): User {
-    const now = new Date();
-    const newUser: User = {
-      id: this.nextId.toString(),
-      ...userData,
-      createdAt: now,
-      updatedAt: now
-    };
-
-    this.users.push(newUser);
-    this.nextId++;
-    return newUser;
+  async createUser(userData: CreateUserRequest): Promise<User> {
+    const newUser = this.userRepository.create(userData);
+    return await this.userRepository.save(newUser);
   }
 
   // READ - Buscar todos os usuários
-  getAllUsers(): User[] {
-    return [...this.users];
+  async getAllUsers(): Promise<User[]> {
+    return await this.userRepository.find({
+      order: { createdAt: 'DESC' }
+    });
   }
 
   // READ - Buscar usuário por ID
-  getUserById(id: string): User | null {
-    const user = this.users.find(u => u.id === id);
-    return user || null;
+  async getUserById(id: number): Promise<User | null> {
+    return await this.userRepository.findOne({
+      where: { id }
+    });
   }
 
   // UPDATE - Atualizar usuário
-  updateUser(id: string, userData: UpdateUserRequest): User | null {
-    const userIndex = this.users.findIndex(u => u.id === id);
-    
-    if (userIndex === -1) {
+  async updateUser(id: number, userData: UpdateUserRequest): Promise<User | null> {
+    const user = await this.userRepository.findOne({
+      where: { id }
+    });
+
+    if (!user) {
       return null;
     }
 
-    const updatedUser = {
-      ...this.users[userIndex],
-      ...userData,
-      updatedAt: new Date()
-    };
-
-    this.users[userIndex] = updatedUser;
-    return updatedUser;
+    // Atualiza apenas os campos fornecidos
+    Object.assign(user, userData);
+    return await this.userRepository.save(user);
   }
 
   // DELETE - Deletar usuário
-  deleteUser(id: string): boolean {
-    const userIndex = this.users.findIndex(u => u.id === id);
-    
-    if (userIndex === -1) {
+  async deleteUser(id: number): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: { id }
+    });
+
+    if (!user) {
       return false;
     }
 
-    this.users.splice(userIndex, 1);
+    await this.userRepository.remove(user);
     return true;
   }
 
   // Buscar usuário por email (para validação)
-  getUserByEmail(email: string): User | null {
-    const user = this.users.find(u => u.email === email);
-    return user || null;
+  async getUserByEmail(email: string): Promise<User | null> {
+    return await this.userRepository.findOne({
+      where: { email }
+    });
   }
 }
 
